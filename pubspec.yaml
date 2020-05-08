@@ -1,0 +1,32 @@
+name: mybook
+description: A social media app focused on groups.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^0.1.2
+  photo_view: ^0.9.2
+  http: ^0.12.1
+  provider: ^4.0.5+1
+  shared_preferences: ^0.5.7
+  datetime_picker_formfield: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: Merriweather
+      fonts:
+        - asset: assets/fonts/Merriweather/Merriweather-Regular.ttf
+    - family: Satisfy
+      fonts:
+        - asset: assets/fonts/Satisfy/Satisfy-Regular.ttf
