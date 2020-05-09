@@ -12,27 +12,12 @@ class Wrapper extends StatefulWidget {
 }
 
 class _WrapperState extends State<Wrapper> {
-  var _currentUID; // User ID of currently logged in user.
-
-  // This async function has to execute first so that we can get the uid.
-  setCurrentUID() async {
-    _currentUID = await AuthService.getUID();
-  }
-
-  // We call the async function from this method so that the _currentUID has a value
-  // before we reach the build method.
-  @override
-  void initState() {
-    setCurrentUID();
-    super.initState();
-  }
+  AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    print(
-        'INSIDE WRAPPER\n_currentUID = $_currentUID\t\t_currentUID == 0 || _currentUID == null - ${_currentUID == 0 || _currentUID == null}'); // TODO Delete
-    return _currentUID == 0 || _currentUID == null
-        ? Authenticate()
-        : BottomNavBar();
+    int uid = _auth.getUID();
+
+    return uid == 0 ? Authenticate() : BottomNavBar();
   }
 }

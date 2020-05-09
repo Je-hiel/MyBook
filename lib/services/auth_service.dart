@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mybook/main.dart';
 import 'package:mybook/constants.dart';
 import 'package:mybook/models/user.dart';
 
@@ -11,29 +11,20 @@ import 'package:mybook/models/user.dart';
 // throughout the application.
 class AuthService {
   // Saves the user id of the current user to disk
-  void _setUID(int uid) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('user_id', uid);
+  void _setUID(int uid) {
+    sp.setInt('user_id', uid);
   }
 
   // Gets the user id of the current user from disk
-  static Future<int> getUID() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int uid = prefs.getInt('user_id') ?? 0;
-
-    // TODO Delete
-    print('\nINSIDE getUID');
-    print('current uid - $uid');
-
-    return Future.value(uid);
+  int getUID() {
+    int uid = sp.getInt('user_id') ?? 0;
+    return uid;
   }
 
   // Removes the user id of the current user from disk
-  void _removeUID() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (prefs.containsKey('user_id')) {
-      prefs.remove('user_id');
+  void _removeUID() {
+    if (sp.containsKey('user_id')) {
+      sp.remove('user_id');
     }
   }
 
@@ -53,7 +44,7 @@ class AuthService {
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
 
-      if (jsonResponse == null) {
+      if (jsonResponse == false) {
         // No user was found with the given credentials
         return null;
       } else {
@@ -95,7 +86,6 @@ class AuthService {
 
         print(errorMsg); // TODO Delete
         return errorMsg;
-        //return null;
       } else {
         print(jsonResponse); // TODO Delete
 
@@ -103,6 +93,7 @@ class AuthService {
         User user = User.fromJson(jsonResponse);
 
         _setUID(user.uid); // Save the user id of the registered user to disk
+
         print(user.uid); // TODO Delete
 
         return User.fromJson(jsonResponse);
@@ -113,7 +104,8 @@ class AuthService {
     }
   }
 
+  // Logs out the user
   void logout() {
-    _removeUID();
+    _removeUID(); // Removes the user id of the current user from disk
   }
 }

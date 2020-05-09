@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mybook/constants.dart';
 import 'package:mybook/models/post.dart';
-import 'package:mybook/services/auth_service.dart';
 import 'package:mybook/widgets/main_app_bar.dart';
-import 'package:mybook/widgets/main_drawer.dart';
 import 'package:mybook/widgets/post/post_tile.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
   const Home({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    AuthService auth = AuthService();
-
     return Scaffold(
-      drawer: MainDrawer(),
       body: CustomScrollView(
         controller: homeController,
         slivers: <Widget>[
@@ -40,10 +34,7 @@ class Home extends StatelessWidget {
       /// LOGOUT functionality has not been built yet. Press this button to clear the user id and hot restart the app to logout
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add_comment),
-        onPressed: () async {
-          print('Removing uid...');
-          auth.logout();
-        },
+        onPressed: () {},
       ),
     );
   }

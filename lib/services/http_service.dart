@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:mybook/constants.dart';
@@ -9,23 +8,30 @@ import 'package:mybook/models/user.dart';
 class HttpService {
   // TODO Need to fix http request to be like signIn and register
   Future<User> getUser(int uid) async {
-    final response = await post(baseURL + getUserPath, body: {
-      "user_id": uid,
-    });
+    final String requestURL = baseURL + getUserPath + '?user_id=$uid';
+    final response = await post(requestURL);
+
+    // TODO Delete
+    print('HTTP SERVICE\t\tIn getUser');
+    print(response.statusCode);
+    print(requestURL);
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
 
       if (jsonResponse == null) {
-        // No user was found with the given user id
+        // User was not returned for some reason.
         return null;
       } else {
         // User found
-        return User.fromJson(jsonResponse);
+        User user = User.fromJson(jsonResponse);
+        print(user.uid); // TODO Delete
+
+        return user;
       }
     } else {
       // Could not connect to server
-      throw Exception('Failed to sign in.');
+      throw Exception('Failed to get user details.');
     }
   }
 }

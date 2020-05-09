@@ -18,7 +18,7 @@ class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
-  dynamic user;
+  var user;
 
   // Text field states
   String username = '';
@@ -27,10 +27,6 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO Delete
-    print(
-        'loading - $loading\tuser - $user\tloading && user != null - ${loading && user != null}');
-
     if (loading && user != null) {
       return BottomNavBar();
     } else if (loading) {
@@ -144,11 +140,6 @@ class _SignInState extends State<SignIn> {
                     if (_formKey.currentState.validate()) {
                       setState(() => loading = true);
 
-                      // TODO Delete
-                      print('\nIn sign in');
-                      print(username);
-                      print(password);
-
                       dynamic result = await _auth.signIn(username, password);
 
                       setState(() {
@@ -172,7 +163,6 @@ class _SignInState extends State<SignIn> {
                     'Don\'t have an account? ',
                     style: TextStyle(
                       fontFamily: 'Merriweather',
-                      //color: Colors.white,
                     ),
                   ),
                   GestureDetector(

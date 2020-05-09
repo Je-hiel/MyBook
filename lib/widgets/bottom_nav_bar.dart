@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:mybook/constants.dart';
+import 'package:mybook/models/user.dart';
+import 'package:mybook/services/auth_service.dart';
+import 'package:mybook/services/http_service.dart';
+import 'package:provider/provider.dart';
+import 'main_drawer.dart';
 
+// The main pages of the app are children of this widget. This bottom nav bar
+// preserves the scrolling position of the user on each page.
 class BottomNavBar extends StatefulWidget {
   @override
   _BottomNavBarState createState() => _BottomNavBarState();
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  HttpService _hs = HttpService();
+  AuthService _auth = AuthService();
+  User _user;
   int _selectedIndex = 0;
 
+  // Sets the selected index to the index of the page to be displayed.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -40,22 +52,43 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
   }
 
+  // Loads the user from the user id stored on the device.
+  void loadUser() async {
+    _user = await _hs.getUser(_auth.getUID());
+  }
+
+  // Ensures that loadUser is called and completed before the widget is built.
+  @override
+  void initState() {
+    loadUser();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageStorage(
-        child: bottomNavBarPages[_selectedIndex],
-        bucket: bucket,
-      ),
-      bottomNavigationBar: GestureDetector(
-        onDoubleTap: _onItemDoubleTapped,
-        child: BottomNavigationBar(
-          // TODO Select color scheme.
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.grey[700],
-          onTap: _onItemTapped,
-          items: bottomNavBarItems,
-          currentIndex: _selectedIndex,
+    return MultiProvider(
+      providers: [
+        Provider<User>(create: (_) => _user),
+        Provider<GlobalKey<ScaffoldState>>(create: (_) => scaffoldKey),
+      ],
+      child: Scaffold(
+        key: scaffoldKey,
+        drawer: MainDrawer(),
+        body: PageStorage(
+          child: bottomNavBarPages[
+              _selectedIndex], // Stores the scroll position on each page.
+          bucket: bucket,
+        ),
+        bottomNavigationBar: GestureDetector(
+          onDoubleTap: _onItemDoubleTapped,
+          child: BottomNavigationBar(
+            // TODO Select color scheme.
+            selectedItemColor: Colors.black,
+            unselectedItemColor: Colors.grey[700],
+            onTap: _onItemTapped,
+            items: bottomNavBarItems,
+            currentIndex: _selectedIndex,
+          ),
         ),
       ),
     );

@@ -1,39 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:mybook/models/user.dart';
+import 'package:mybook/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
-// TODO Make sure drawer covers bottomNavBar when open
 class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<User>(context);
+    AuthService _auth = AuthService();
+
     return Drawer(
       child: ListView(
         children: <Widget>[
-          // TODO Make DrawerHeader bigger.
-          DrawerHeader(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                CircleAvatar(
-                  // TODO Replace with user profile photo.
-                  backgroundImage: AssetImage('assets/images/jehiel.jpg'),
-                  radius: 30.0,
-                ),
-                SizedBox(height: 10.0),
-                // TODO Replace with user display name.
-                Text('Je-hiel Smith'),
-                SizedBox(height: 2.0),
-                // TODO Replace with user username.
-                Text('@jehielsmith'),
-                SizedBox(height: 10.0),
-                Row(
-                  children: <Widget>[
-                    // TODO Replace with user friend count.
-                    Text('168 Friends'),
-                    SizedBox(width: 15.0),
-                    // TODO Replace with user group count.
-                    Text('37 Groups'),
-                  ],
-                ),
-              ],
+          UserAccountsDrawerHeader(
+            accountName:
+                Text('${user.firstName} ${user.lastName}'), // TODO Add styling.
+            accountEmail: Text('@${user.username}'),
+            currentAccountPicture: CircleAvatar(
+              // TODO Replace with user profile photo.
+              backgroundImage: AssetImage('assets/images/jehiel.jpg'),
+              radius: 30.0,
             ),
           ),
           // TODO Provide navigation to other screens.
@@ -46,6 +33,18 @@ class MainDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.settings),
             title: Text('Settings'),
+          ),
+          ListTile(
+            leading: Transform.rotate(
+              child: Icon(Icons.exit_to_app),
+              angle: 180 * math.pi / 180,
+            ),
+            title: Text('Logout'),
+            onTap: () {
+              _auth.logout();
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/Authenticate', (Route<dynamic> route) => false);
+            },
           ),
         ],
       ),

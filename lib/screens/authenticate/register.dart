@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mybook/models/user.dart';
 import 'package:mybook/services/auth_service.dart';
 import 'package:mybook/widgets/bottom_nav_bar.dart';
 import 'package:mybook/widgets/loading.dart';
@@ -21,7 +20,7 @@ class _RegisterState extends State<Register> {
   final _personalInfoFormKey = GlobalKey<FormState>();
   final _profileInfoFormKey = GlobalKey<FormState>();
   bool loading = false;
-  dynamic user; // Returned from http request
+  var user; // Returned from http request
 
   // Text field states
   String firstName = '';
@@ -38,10 +37,6 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO Delete
-    print(
-        'loading - $loading\tuser - $user\tloading && user != null - ${loading && user != null}');
-
     if (loading && user != null) {
       return BottomNavBar();
     } else if (loading) {
@@ -288,11 +283,6 @@ class _RegisterState extends State<Register> {
                         _profileInfoFormKey.currentState.validate()) {
                       setState(() => loading = true);
 
-                      // TODO Delete
-                      print('\nIn Register');
-                      print(username);
-                      print(password);
-
                       dynamic result = await _auth.register(
                           username, email, password, firstName, lastName, dob);
 
@@ -304,10 +294,7 @@ class _RegisterState extends State<Register> {
                           error = result;
                           loading = false;
                         } else {
-                          user = result as User;
-
-                          print(
-                              '\nUSER WAS VALID\t\tuser == null - ${user == null}\nuser - $user\n\n'); // TODO Delete
+                          user = result;
                         }
                       });
                     }
