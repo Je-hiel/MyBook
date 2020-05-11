@@ -1,6 +1,6 @@
 // Model class for a comment
 class Comment {
-  String text;
+  String body;
 
-  Comment({this.text});
+  Comment({this.body});
 }

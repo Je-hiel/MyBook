@@ -10,102 +10,114 @@ import 'package:mybook/models/user.dart';
 // when they restart the app their user id is read from the device and used
 // throughout the application.
 class AuthService {
-  // Saves the user id of the current user to disk
+  // Saves the user id of the current user to disk.
   void _setUID(int uid) {
     sp.setInt('user_id', uid);
   }
 
-  // Gets the user id of the current user from disk
+  // Gets the user id of the current user from disk.
   int getUID() {
     int uid = sp.getInt('user_id') ?? 0;
     return uid;
   }
 
-  // Removes the user id of the current user from disk
+  // Removes the user id of the current user from disk.
   void _removeUID() {
     if (sp.containsKey('user_id')) {
       sp.remove('user_id');
     }
   }
 
-  // Sign in with username and password
-  Future<User> signIn(String username, String password) async {
-    final String requestURL =
-        baseURL + signInPath + '?username=$username&password=$password';
-    final response = await post(requestURL);
+  // Sign in with username and password.
+  Future signIn(String username, String password) async {
+    // We have to encode the user input to be used in the request calls.
+    final String uid = Uri.encodeQueryComponent(username);
+    final String pass = Uri.encodeQueryComponent(password);
 
-    // TODO Delete
-    print('AUTH SERVICE\t\tIn sign in');
-    print(response.statusCode);
-    print(requestURL);
+    // Full URL of request.
+    final String requestURL =
+        baseURL + signInPath + '?username=$uid&password=$pass';
 
     _setUID(0);
 
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
+    try {
+      // Response from request.
+      final response = await post(requestURL);
 
-      if (jsonResponse == false) {
-        // No user was found with the given credentials
-        return null;
+      // If we made the request successfully.
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        if (jsonResponse == false) {
+          // No user was found with the given credentials.
+          return null;
+        } else {
+          // User found.
+          User user = User.fromJson(jsonResponse);
+
+          // Save the user id of the signed in user to disk.
+          _setUID(user.uid);
+
+          return user;
+        }
       } else {
-        // User found
-        User user = User.fromJson(jsonResponse);
-        _setUID(user.uid); // Save the user id of the signed in user to disk
-
-        print(user.uid); // TODO Delete
-
-        return user;
+        return 'We had trouble connecting. Please try again later.';
       }
-    } else {
-      // Could not connect to server
-      throw Exception('Failed to sign in.');
+    } catch (e) {
+      return 'Something went wrong. Please try again later.';
     }
   }
 
-  // Registers user
+  // Registers user.
   Future register(String username, String email, String password,
       String firstName, String lastName, String dob) async {
+    // We have to encode the user input to be used in the request calls.
+    // We do not need to encode dob.
+    final String uName = Uri.encodeQueryComponent(username);
+    final String uEmail = Uri.encodeQueryComponent(email);
+    final String uPassword = Uri.encodeQueryComponent(password);
+    final String uFName = Uri.encodeQueryComponent(firstName);
+    final String uLName = Uri.encodeQueryComponent(lastName);
+
+    // Full URL of request.
     final String requestURL = baseURL +
         registerPath +
-        '?username=$username&email=$email&password=$password&first_name=$firstName&last_name=$lastName&date_of_birth=$dob';
-    final response = await post(requestURL);
+        '?username=$uName&email=$uEmail&password=$uPassword&first_name=$uFName&last_name=$uLName&date_of_birth=$dob';
 
     _setUID(0);
+    print('\n$requestURL\n');
+    try {
+      // Response from request.
+      final response = await post(requestURL);
 
-    // TODO Delete
-    print('AUTH SERVICE\t\tIn register');
-    print(response.statusCode);
-    print(requestURL);
+      // If we made the request successfully.
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
+        if (jsonResponse.runtimeType == String) {
+          // Username or email already in use.
+          String errorMsg = jsonResponse;
+          return errorMsg;
+        } else {
+          // User registered.
+          User user = User.fromJson(jsonResponse);
 
-      if (jsonResponse.runtimeType == String) {
-        // Username or email already in use.
-        String errorMsg = jsonResponse;
+          // Save the user id of the registered user to disk.
+          _setUID(user.uid);
 
-        print(errorMsg); // TODO Delete
-        return errorMsg;
+          return user;
+        }
       } else {
-        print(jsonResponse); // TODO Delete
-
-        // User registered
-        User user = User.fromJson(jsonResponse);
-
-        _setUID(user.uid); // Save the user id of the registered user to disk
-
-        print(user.uid); // TODO Delete
-
-        return User.fromJson(jsonResponse);
+        return 'We had trouble connecting. Please try again later.';
       }
-    } else {
-      // Could not connect to server
-      throw Exception('Failed to register user.');
+    } catch (e) {
+      return 'Something went wrong. Please try again later.';
     }
   }
 
   // Logs out the user
   void logout() {
-    _removeUID(); // Removes the user id of the current user from disk
+    // Removes the user id of the current user from disk.
+    _removeUID();
   }
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// App bar for use inside of custom scroll view.
 class MainAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GlobalKey<ScaffoldState> scaffoldKey =
         Provider.of<GlobalKey<ScaffoldState>>(context);
+    //User user = Provider.of<User>(context);
 
     return SliverAppBar(
       floating: true,
@@ -17,7 +19,8 @@ class MainAppBar extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
             // TODO Replace with user profile photo.
-            backgroundImage: AssetImage('assets/images/jehiel.jpg'),
+            backgroundImage: AssetImage(
+                'assets/images/jehiel.jpg'), //NetworkImage(user.profilePhoto),
           ),
         ),
         onTap: () => scaffoldKey.currentState.openDrawer(),

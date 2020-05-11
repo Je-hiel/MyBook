@@ -9,8 +9,7 @@ SharedPreferences sp;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  sp = await SharedPreferences
-      .getInstance(); // Gets the user id of the logged in user.
+  sp = await SharedPreferences.getInstance();
   runApp(new MyApp());
 }
 
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
         '/Authenticate': (BuildContext context) => new Authenticate()
       },
       home:
-          Wrapper(), // The wrapper widget determines if we authenticate the user or take them straight to the home screen
+          Wrapper(), // The wrapper widget determines if we authenticate the user or take them straight to the home screen.
     );
   }
 }
