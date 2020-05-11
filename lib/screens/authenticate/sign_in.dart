@@ -17,8 +17,8 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
-  bool loading = false;
-  var user;
+  bool _loading = false;
+  var _user;
 
   // Text field states
   String username = '';
@@ -27,9 +27,9 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading && user != null) {
+    if (_loading && _user != null) {
       return BottomNavBar();
-    } else if (loading) {
+    } else if (_loading) {
       return Loading();
     } else {
       return Scaffold(
@@ -138,16 +138,19 @@ class _SignInState extends State<SignIn> {
                       borderRadius: BorderRadius.circular(30.0)),
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
-                      setState(() => loading = true);
+                      setState(() => _loading = true);
 
                       dynamic result = await _auth.signIn(username, password);
 
                       setState(() {
-                        if (result == null) {
+                        if (result.runtimeType == String) {
+                          error = result;
+                          _loading = false;
+                        } else if (result == null) {
                           error = 'Could not sign in with those credentials.';
-                          loading = false;
+                          _loading = false;
                         } else {
-                          user = result;
+                          _user = result;
                         }
                       });
                     }

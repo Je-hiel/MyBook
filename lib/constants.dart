@@ -11,6 +11,8 @@ final String baseURI = '10.0.2.2';
 final String registerPath = '/register.php';
 final String signInPath = '/sign_in.php';
 final String getUserPath = '/get_user.php';
+final String addPostPath = '/add_post.php';
+final String getPostsPath = '/get_posts.php';
 final headers = <String, String>{
   'Content-Type': 'application/json; charset=UTF-8'
 };

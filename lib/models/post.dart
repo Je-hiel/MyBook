@@ -2,11 +2,13 @@ import 'package:mybook/models/comment.dart';
 
 // Model class for a post
 // TODO Set up userID, likes counter, attach comments, attach time created...
+// TODO Save some user data of person that created the post.
 class Post {
+  String createdAt;
   String title;
-  String text;
-  List<String> images;
-  List<Comment> comments;
+  String body;
+  List<String> images = [];
+  List<Comment> comments = [];
   int likesCount = 0;
   int dislikesCount = 0;
 
@@ -15,11 +17,21 @@ class Post {
   bool disliked = false;
   bool commented = false;
 
-  Post(
+  /*Post(
       {this.title,
-      this.text,
+      this.body,
       this.images = const [],
-      this.comments = const []});
+      this.comments = const []});*/
+
+  Post({this.title, this.body, this.createdAt});
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      title: json['title'],
+      body: json['content'],
+      createdAt: json['created_at'],
+    );
+  }
 
   bool hasImages() {
     return images.length > 0;
@@ -80,18 +92,35 @@ class Post {
     }
   }
 
-  void addComment(String commentText) {
+  void addComment(String body) {
     commented = true;
     comments.add(Comment(
-      text: commentText,
+      body: body,
     ));
   }
 }
 
+class PostList {
+  List<Post> posts;
+
+  PostList({this.posts});
+
+  factory PostList.fromJson(List<dynamic> json) {
+    List<Post> result = [];
+
+    for (var post in json) {
+      result.add(Post.fromJson(post));
+    }
+
+    return PostList(posts: result);
+  }
+}
+
+/*
 List<Post> posts = [
   Post(
     title: 'Hello world!',
-    text:
+    body:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec pellentesque tellus. Donec egestas metus sit amet cursus sagittis.',
     images: [
       'https://pbs.twimg.com/profile_images/949787136030539782/LnRrYf6e_400x400.jpg',
@@ -101,54 +130,54 @@ List<Post> posts = [
       'https://www.apimages.com/Images/Ap_Creative_Stock_Header.jpg',
     ],
     comments: [
-      Comment(text: 'Great!'),
-      Comment(text: 'Hoorah'),
-      Comment(text: 'Howzat'),
-      Comment(text: 'Impeccable'),
-      Comment(text: 'Agueroooooooooooo'),
-      Comment(text: 'Didn\'t think you had it in you'),
+      Comment(body: 'Great!'),
+      Comment(body: 'Hoorah'),
+      Comment(body: 'Howzat'),
+      Comment(body: 'Impeccable'),
+      Comment(body: 'Agueroooooooooooo'),
+      Comment(body: 'Didn\'t think you had it in you'),
     ],
   ),
   Post(
     title: 'How are you my peeps?',
-    text:
+    body:
         'Donec eu consectetur dolor. Aenean sed odio et metus tincidunt aliquam. Mauris sit amet egestas arcu. Nullam tempus, mi et rhoncus mattis, ex arcu mollis diam, et suscipit nisl sapien eget est. In iaculis porta lorem, eget gravida arcu convallis eget. Vivamus ac urna nec risus vulputate elementum. Nullam eleifend elit vestibulum justo rutrum, at auctor erat sagittis. Curabitur quis euismod velit, sit amet efficitur diam. Nullam at lacus nisl. Praesent mollis pharetra lacus, sed ullamcorper mauris porta non. Proin non sagittis ipsum.',
     images: [],
     comments: [
       Comment(
-          text:
+          body:
               'Blah blah blah blah blah blah blah blah blah blah blah blah blah blah'),
     ],
   ),
   Post(
     title: 'Just landed safely',
-    text:
+    body:
         'Cras blandit eros eget porta consequat. Curabitur tempus ultrices tellus, et hendrerit tellus ultrices eu. In nec ipsum in metus pulvinar blandit. Sed ultrices id nisl quis varius. Suspendisse sed scelerisque eros. Proin luctus sodales augue. Proin vestibulum elit ut lectus egestas lobortis. Vestibulum imperdiet lacus ac feugiat bibendum.',
     images: [
       'https://media.gettyimages.com/photos/woman-using-a-computer-picture-id846202328?s=612x612',
       'https://media.istockphoto.com/photos/young-boy-working-on-a-laptop-computer-stock-image-picture-id1077332896',
     ],
     comments: [
-      Comment(text: 'Oops'),
-      Comment(text: 'I'),
-      Comment(text: 'Did '),
-      Comment(text: 'It'),
-      Comment(text: 'Again'),
-      Comment(text: 'The quick brown fox jumps over the lazy rabbit.'),
+      Comment(body: 'Oops'),
+      Comment(body: 'I'),
+      Comment(body: 'Did '),
+      Comment(body: 'It'),
+      Comment(body: 'Again'),
+      Comment(body: 'The quick brown fox jumps over the lazy rabbit.'),
       Comment(
-          text:
+          body:
               'Yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah yeah'),
     ],
   ),
   Post(
     title: 'Worst day ever',
-    text:
+    body:
         'In sagittis ornare nisl. Nam volutpat, libero porta laoreet porta, sapien justo iaculis ipsum, a aliquam orci augue vel erat. Nulla ut nunc pulvinar, faucibus ligula vitae, scelerisque arcu.',
     images: [],
   ),
   Post(
     title: 'Living my best life',
-    text:
+    body:
         'Etiam faucibus pharetra elit nec vulputate. Integer consequat, ex porta accumsan commodo, arcu ligula vestibulum sapien, quis dictum diam ante at sem. In consectetur euismod dolor, pretium accumsan mi semper sed. In at condimentum nulla. Cras bibendum mollis sodales. Proin ligula nisi, commodo et dolor vel, posuere interdum quam. \n\nDonec eu consectetur dolor. Aenean sed odio et metus tincidunt aliquam. Mauris sit amet egestas arcu. Nullam tempus, mi et rhoncus mattis, ex arcu mollis diam, et suscipit nisl sapien eget est. In iaculis porta lorem, eget gravida arcu convallis eget. Vivamus ac urna nec risus vulputate elementum. Nullam eleifend elit vestibulum justo rutrum, at auctor erat sagittis. Curabitur quis euismod velit, sit amet efficitur diam. \n\nNullam at lacus nisl. Praesent mollis pharetra lacus, sed ullamcorper mauris porta non. Proin non sagittis ipsum. Donec eu consectetur dolor. Aenean sed odio et metus tincidunt aliquam. Mauris sit amet egestas arcu. Nullam tempus, mi et rhoncus mattis, ex arcu mollis diam, et suscipit nisl sapien eget est. In iaculis porta lorem, eget gravida arcu convallis eget. Vivamus ac urna nec risus vulputate elementum. Nullam eleifend elit vestibulum justo rutrum, at auctor erat sagittis. Curabitur quis euismod velit, sit amet efficitur diam. Nullam at lacus nisl. Praesent mollis pharetra lacus, sed ullamcorper mauris porta non. Proin non sagittis ipsum.',
     images: [
       'https://img3.stockfresh.com/files/m/monkey_business/m/84/82578_stock-photo-college-students-in-a-computer-lab.jpg',
@@ -156,8 +185,9 @@ List<Post> posts = [
       'https://previews.123rf.com/images/wavebreakmediamicro/wavebreakmediamicro1302/wavebreakmediamicro130200291/18125976-mature-students-taking-notes-in-lecture-in-college.jpg',
     ],
     comments: [
-      Comment(text: 'Wow what a test'),
-      Comment(text: 'Sending thoughts and prayers'),
+      Comment(body: 'Wow what a test'),
+      Comment(body: 'Sending thoughts and prayers'),
     ],
   ),
 ];
+*/

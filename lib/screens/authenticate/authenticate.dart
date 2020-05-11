@@ -9,7 +9,7 @@ class Authenticate extends StatefulWidget {
 }
 
 class _AuthenticateState extends State<Authenticate> {
-  bool showSignIn = true; // Shows the sign in by default
+  bool showSignIn = true; // Shows the sign in by default.
 
   // Allows the user to toggle between sign in and register screens by changing
   // the showSignIn value.
