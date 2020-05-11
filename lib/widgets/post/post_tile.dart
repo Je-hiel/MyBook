@@ -48,7 +48,7 @@ class _PostTileState extends State<PostTile> {
               SizedBox(height: 5.0),
               // Post text
               Text(
-                post.text,
+                post.body,
                 overflow: TextOverflow.fade,
                 maxLines: 7,
               ),

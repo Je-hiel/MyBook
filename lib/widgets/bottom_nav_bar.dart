@@ -14,11 +14,12 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<
+      ScaffoldState>(); // Used to open the drawer from other widgets in the tree.
   HttpService _hs = HttpService();
   AuthService _auth = AuthService();
   User _user;
-  int _selectedIndex = 0;
+  int _selectedIndex = 0; // Defaults to homepage.
 
   // Sets the selected index to the index of the page to be displayed.
   void _onItemTapped(int index) {
@@ -68,21 +69,24 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<User>(create: (_) => _user),
-        Provider<GlobalKey<ScaffoldState>>(create: (_) => scaffoldKey),
+        Provider<User>(
+            create: (_) =>
+                _user), // Provides the signed in user to widgets in the tree.
+        Provider<GlobalKey<ScaffoldState>>(
+            create: (_) =>
+                scaffoldKey), // Provides the scaffold key to widgets in the tree.
       ],
       child: Scaffold(
         key: scaffoldKey,
         drawer: MainDrawer(),
         body: PageStorage(
-          child: bottomNavBarPages[
-              _selectedIndex], // Stores the scroll position on each page.
+          // Stores the scroll position on each page.
+          child: bottomNavBarPages[_selectedIndex],
           bucket: bucket,
         ),
         bottomNavigationBar: GestureDetector(
           onDoubleTap: _onItemDoubleTapped,
           child: BottomNavigationBar(
-            // TODO Select color scheme.
             selectedItemColor: Colors.black,
             unselectedItemColor: Colors.grey[700],
             onTap: _onItemTapped,

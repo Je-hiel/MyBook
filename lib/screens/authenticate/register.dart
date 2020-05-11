@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mybook/services/auth_service.dart';
 import 'package:mybook/widgets/bottom_nav_bar.dart';
@@ -17,10 +18,9 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
-  final _personalInfoFormKey = GlobalKey<FormState>();
-  final _profileInfoFormKey = GlobalKey<FormState>();
-  bool loading = false;
-  var user; // Returned from http request
+  final _formKey = GlobalKey<FormState>();
+  bool _loading = false;
+  var _user;
 
   // Text field states
   String firstName = '';
@@ -37,9 +37,9 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading && user != null) {
+    if (_loading && _user != null) {
       return BottomNavBar();
-    } else if (loading) {
+    } else if (_loading) {
       return Loading();
     } else {
       return Scaffold(
@@ -86,27 +86,25 @@ class _RegisterState extends State<Register> {
                 ),
               ),
               SizedBox(height: 15.0),
-              // Subtitle
-              Padding(
-                padding: const EdgeInsets.only(left: 18.0),
-                child: Text(
-                  'Personal Information',
-                  style: TextStyle(
-                      fontFamily: 'Merriweather',
-                      fontSize: 18.0,
-                      color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 10.0),
-              // Personal Information form
+              // Create an account form
               // TODO Add more validation to form
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 18.0),
                 child: Form(
-                  key: _personalInfoFormKey,
+                  key: _formKey,
                   child: SingleChildScrollView(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        // Subtitle
+                        Text(
+                          'Personal Information',
+                          style: TextStyle(
+                              fontFamily: 'Merriweather',
+                              fontSize: 18.0,
+                              color: Colors.white),
+                        ),
+                        SizedBox(height: 10.0),
                         // First name
                         TextFormField(
                           decoration: textInputDecoration.copyWith(
@@ -177,34 +175,16 @@ class _RegisterState extends State<Register> {
                             setState(() => email = val);
                           },
                         ),
+                        SizedBox(height: 35.0),
+                        // Subtitle
+                        Text(
+                          'Profile Information',
+                          style: TextStyle(
+                              fontFamily: 'Merriweather',
+                              fontSize: 18.0,
+                              color: Colors.white),
+                        ),
                         SizedBox(height: 10.0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 25.0),
-              // Subtitle
-              Padding(
-                padding: const EdgeInsets.only(left: 18.0),
-                child: Text(
-                  'Profile Information',
-                  style: TextStyle(
-                      fontFamily: 'Merriweather',
-                      fontSize: 18.0,
-                      color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 10.0),
-              // Profile Information form
-              // TODO Add more validation to form
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 18.0),
-                child: Form(
-                  key: _profileInfoFormKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
                         // Username
                         TextFormField(
                           decoration: textInputDecoration.copyWith(
@@ -279,22 +259,18 @@ class _RegisterState extends State<Register> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0)),
                   onPressed: () async {
-                    if (_personalInfoFormKey.currentState.validate() &&
-                        _profileInfoFormKey.currentState.validate()) {
-                      setState(() => loading = true);
+                    if (_formKey.currentState.validate()) {
+                      setState(() => _loading = true);
 
                       dynamic result = await _auth.register(
                           username, email, password, firstName, lastName, dob);
 
                       setState(() {
-                        if (result == null) {
-                          error = 'Could not register with those credentials.';
-                          loading = false;
-                        } else if (result.runtimeType == String) {
+                        if (result.runtimeType == String) {
                           error = result;
-                          loading = false;
+                          _loading = false;
                         } else {
-                          user = result;
+                          _user = result;
                         }
                       });
                     }

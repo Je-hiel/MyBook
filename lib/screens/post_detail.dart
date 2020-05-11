@@ -42,7 +42,7 @@ class _PostDetailState extends State<PostDetail> {
               ),
               SizedBox(height: 10),
               // Post text
-              Text(post.text),
+              Text(post.body),
               SizedBox(height: 10.0),
               // Post images (if any)
               Visibility(
