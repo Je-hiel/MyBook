@@ -13,6 +13,7 @@ class MainAppBar extends StatelessWidget {
       floating: true,
       pinned: false,
       snap: false,
+      elevation: 0,
       // User profile photo
       leading: GestureDetector(
         child: Padding(
@@ -20,7 +21,7 @@ class MainAppBar extends StatelessWidget {
           child: CircleAvatar(
             // TODO Replace with user profile photo.
             backgroundImage: AssetImage(
-                'assets/images/jehiel.jpg'), //NetworkImage(user.profilePhoto),
+                'assets/images/default user.png'), //NetworkImage(user.profilePhoto),
           ),
         ),
         onTap: () => scaffoldKey.currentState.openDrawer(),

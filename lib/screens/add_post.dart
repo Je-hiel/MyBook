@@ -4,7 +4,6 @@ import 'package:mybook/models/user.dart';
 import 'package:mybook/services/http_service.dart';
 import 'package:mybook/widgets/bottom_nav_bar.dart';
 import 'package:mybook/widgets/loading.dart';
-import 'package:mybook/widgets/post_loading.dart';
 import 'package:provider/provider.dart';
 
 class AddPost extends StatefulWidget {

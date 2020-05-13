@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         // TODO Specify more colors here.
         primarySwatch: Colors.blueGrey,
+        fontFamily: 'Merriweather',
       ),
       routes: <String, WidgetBuilder>{
         '/Authenticate': (BuildContext context) => new Authenticate()

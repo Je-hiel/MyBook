@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:mybook/models/post.dart';
-import 'package:mybook/screens/post_detail.dart';
-import 'package:mybook/widgets/post/interaction_row.dart';
-import 'package:mybook/widgets/post/post_content.dart';
-import 'package:mybook/widgets/post/post_header.dart';
+import 'package:mybook/models/group.dart';
 import 'package:provider/provider.dart';
+import 'package:mybook/widgets/group_header.dart';
+import 'package:mybook/widgets/group_action_row.dart';
+import 'group_detail.dart';
 
-class PostTile extends StatelessWidget {
+class GroupTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Post post = Provider.of<Post>(context);
+    Group group = Provider.of<Group>(context);
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => Provider<Post>(
-            create: (_) => post,
-            child: PostDetail(post: post),
+          builder: (_) => Provider<Group>(
+            create: (_) => group,
+            child: GroupDetail(),
           ),
         ),
       ),
@@ -26,10 +25,9 @@ class PostTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              PostHeader(timeDetail: false),
+              GroupHeader(),
               SizedBox(height: 11.0),
-              PostContent(preview: true),
-              InteractionRow(),
+              GroupActionRow(),
             ],
           ),
         ),

@@ -15,6 +15,7 @@ dependencies:
   shared_preferences: ^0.5.7
   datetime_picker_formfield: ^1.0.0
   image_picker: ^0.6.6+1
+  timeago: ^2.0.26
 
 dev_dependencies:
   flutter_test:

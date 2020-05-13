@@ -1,14 +1,21 @@
 import 'package:mybook/models/comment.dart';
+import 'package:mybook/services/http_service.dart';
 
-// Model class for a post
-// TODO Set up userID, likes counter, attach comments, attach time created...
-// TODO Save some user data of person that created the post.
+HttpService hs = HttpService();
+
+// Model class for a post.
 class Post {
-  String createdAt;
+  int id;
+  String firstName;
+  String lastName;
+  String username;
   String title;
   String body;
+  String createdAt;
   List<String> images = [];
-  List<Comment> comments = [];
+
+  //List<Comment> comments = [];
+  //int commentCount = 0;
   int likesCount = 0;
   int dislikesCount = 0;
 
@@ -17,30 +24,42 @@ class Post {
   bool disliked = false;
   bool commented = false;
 
-  /*Post(
-      {this.title,
-      this.body,
-      this.images = const [],
-      this.comments = const []});*/
-
-  Post({this.title, this.body, this.createdAt});
+  Post({
+    this.id,
+    this.firstName,
+    this.lastName,
+    this.username,
+    this.title,
+    this.body,
+    this.createdAt,
+    //this.commentCount
+  });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
+      id: json['post_id'],
+      firstName: json['first_name'],
+      lastName: json['last_name'],
+      username: json['username'],
       title: json['title'],
       body: json['content'],
       createdAt: json['created_at'],
     );
   }
 
+  /*// Gets the comments associated with a post.
+  getComments(int pid) async {
+    comments = await hs.getComments(pid);
+  }
+*/
   bool hasImages() {
     return images.length > 0;
   }
 
-  bool hasComments() {
+  /*bool hasComments() {
     return comments.length > 0;
   }
-
+*/
   void incrementLikes() {
     likesCount++;
   }
@@ -92,24 +111,28 @@ class Post {
     }
   }
 
-  void addComment(String body) {
+  /*void addComment(String body) {
     commented = true;
-    comments.add(Comment(
-      body: body,
-    ));
-  }
+    comments.add(
+      Comment(
+        body: body,
+      ),
+    );
+  }*/
 }
 
+// Model class for a list of comments decoded from json.
 class PostList {
   List<Post> posts;
 
   PostList({this.posts});
 
-  factory PostList.fromJson(List<dynamic> json) {
+  PostList postListFromJson(List<dynamic> json) {
     List<Post> result = [];
 
-    for (var post in json) {
-      result.add(Post.fromJson(post));
+    for (var jsonPost in json) {
+      Post post = Post.fromJson(jsonPost); // Creates the post from json.
+      result.add(post); // Adds the post to the list of posts.
     }
 
     return PostList(posts: result);

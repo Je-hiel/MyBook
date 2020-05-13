@@ -19,7 +19,7 @@ class MainDrawer extends StatelessWidget {
             accountEmail: Text('@${user.username}'),
             currentAccountPicture: CircleAvatar(
               // TODO Replace with user profile photo.
-              backgroundImage: AssetImage('assets/images/jehiel.jpg'),
+              backgroundImage: AssetImage('assets/images/default user.png'),
               radius: 30.0,
             ),
           ),

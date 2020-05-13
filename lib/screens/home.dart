@@ -1,5 +1,4 @@
 import 'package:async/async.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mybook/constants.dart';
 import 'package:mybook/models/post.dart';
@@ -56,7 +55,6 @@ class _HomeState extends State<Home> {
                 Provider.of<GlobalKey<ScaffoldState>>(context);
 
             if (posts.isEmpty) {
-              //User user = Provider.of<User>(context);
               return Scaffold(
                 appBar: AppBar(
                   leading: GestureDetector(
@@ -86,16 +84,24 @@ class _HomeState extends State<Home> {
                     ),
                   ],
                 ),
-                body: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Text(
-                      'No posts yet!\n\nAdd some friends or create your own posts.',
-                      style:
-                          TextStyle(fontSize: 16.0, fontFamily: 'Merriweather'),
-                      textAlign: TextAlign.center,
+                body: RefreshIndicator(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text(
+                        'No posts yet!\n\nAdd some friends or create your own posts.',
+                        style: TextStyle(fontSize: 16.0),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
+                  onRefresh: () {
+                    setState(() {
+                      _postsCache.invalidate();
+                    });
+                    return Future.value(1);
+                  },
+                  displacement: 80.0,
                 ),
                 floatingActionButton: FloatingActionButton(
                   child: Icon(Icons.create),
@@ -117,6 +123,7 @@ class _HomeState extends State<Home> {
               return Scaffold(
                 body: RefreshIndicator(
                   child: CustomScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
                     controller: homeController,
                     slivers: <Widget>[
                       // AppBar that hides as the user scrolls down and reappears
@@ -126,7 +133,10 @@ class _HomeState extends State<Home> {
                         // Builds list of posts.
                         delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
-                            return PostTile(post: posts[index]);
+                            return Provider<Post>(
+                              create: (_) => posts[index],
+                              child: PostTile(),
+                            );
                           },
                           childCount: posts.length,
                         ),

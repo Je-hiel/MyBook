@@ -35,8 +35,9 @@ class AuthService {
     final String pass = Uri.encodeQueryComponent(password);
 
     // Full URL of request.
+    // final String requestURL = baseURL + signInPath + '?username=$uid&password=$pass';
     final String requestURL =
-        baseURL + signInPath + '?username=$uid&password=$pass';
+        testBaseURL + signInPath + '?username=$uid&password=$pass';
 
     _setUID(0);
 
@@ -80,7 +81,8 @@ class AuthService {
     final String uLName = Uri.encodeQueryComponent(lastName);
 
     // Full URL of request.
-    final String requestURL = baseURL +
+    // final String requestURL = baseURL + registerPath + '?username=$uName&email=$uEmail&password=$uPassword&first_name=$uFName&last_name=$uLName&date_of_birth=$dob';
+    final String requestURL = testBaseURL +
         registerPath +
         '?username=$uName&email=$uEmail&password=$uPassword&first_name=$uFName&last_name=$uLName&date_of_birth=$dob';
 

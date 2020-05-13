@@ -1,34 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:mybook/models/post.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PostHeader extends StatelessWidget {
-  final Post post;
+  final bool timeDetail;
 
-  PostHeader({this.post});
+  PostHeader({this.timeDetail});
 
-  // How do we update user profile photo in post header?
   @override
   Widget build(BuildContext context) {
+    Post post = Provider.of<Post>(context);
+    final String date = DateFormat('HH:mm • d MMM yy').format(
+        DateTime.parse('${post.createdAt}').subtract(Duration(hours: 5)));
+
     return Row(
       children: <Widget>[
         // TODO Replace with user profile photo.
         CircleAvatar(
-          backgroundImage: AssetImage('assets/images/jehiel.jpg'),
+          backgroundImage: AssetImage('assets/images/default user.png'),
           radius: 20.0,
         ),
         SizedBox(width: 10),
         Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // TODO Replace with user display name.
-            Text('Je-hiel Smith'),
+            Text(
+              '${post.firstName} ${post.lastName}',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             SizedBox(height: 3.0),
-            // TODO Replace with user username.
-            Text('@jehielsmith'),
+            Text(
+              '@${post.username}',
+              style: TextStyle(fontWeight: FontWeight.w400),
+            ),
           ],
         ),
         Spacer(),
-        // TODO Replace with post created_at value.
-        Text('4hrs'),
+        timeDetail
+            ? Text(date)
+            : Text(
+                timeago.format(
+                  DateTime.parse('${post.createdAt}').subtract(
+                    Duration(hours: 5), // Hard-coded timezone. Not good.
+                  ),
+                ),
+              ),
       ],
     );
   }

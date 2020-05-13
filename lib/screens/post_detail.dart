@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:mybook/constants.dart';
+import 'package:async/async.dart';
+import 'package:mybook/models/comment.dart';
 import 'package:mybook/models/post.dart';
+import 'package:mybook/services/auth_service.dart';
+import 'package:mybook/services/http_service.dart';
+import 'package:mybook/widgets/post/comment_tile.dart';
+import 'package:mybook/widgets/post/interaction_row.dart';
+import 'package:mybook/widgets/post/post_content.dart';
 import 'package:mybook/widgets/post/post_header.dart';
-import 'package:mybook/widgets/post/post_photos.dart';
+import 'package:provider/provider.dart';
 
-// WHY IS THIS STATEFUL?
 class PostDetail extends StatefulWidget {
-  final Post post;
+  Post post;
 
   PostDetail({this.post});
 
@@ -15,94 +20,153 @@ class PostDetail extends StatefulWidget {
 }
 
 class _PostDetailState extends State<PostDetail> {
+  final _commentsCache = new AsyncCache<List<Comment>>(Duration(minutes: 5));
+  final TextEditingController _commentController = TextEditingController();
+  final HttpService _hs = new HttpService();
+  final AuthService _auth = new AuthService();
+  String comment;
+
+  Future<List<Comment>> getCommentsInCache() {
+    return _commentsCache.fetch(() {
+      return _hs.getComments(widget.post.id);
+    });
+  }
+
+  @override
+  void initState() {
+    _commentsCache.invalidate();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Post post = widget.post;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Post'),
       ),
-      body: ListView(children: <Widget>[
-        Padding(
+      body: Builder(
+        builder: (context) => Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: <Widget>[
-              // TODO Would have to pass in user who made the post.
-              PostHeader(),
-              SizedBox(height: 20),
-              // TODO Add Hero widget between PostTile and PostDetail.
-              // TODO Build PostContent widget.
-              //PostContent(post: widget.post),
-              // TODO Create post specific text styling.
-              Text(
-                post.title,
-                style: titleStyle,
-              ),
-              SizedBox(height: 10),
-              // Post text
-              Text(post.body),
-              SizedBox(height: 10.0),
-              // Post images (if any)
-              Visibility(
-                visible: post.hasImages(),
-                child: PostPhotos(imageURLs: post.images),
-              ),
-              // Post buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                // TODO Make buttons change colour and keep count when pressed.
+              ListView(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.thumb_up),
-                        iconSize: 20.0,
-                        onPressed: () {
-                          setState(post.likePost);
-                        },
-                        color: post.liked ? Colors.green : Colors.grey,
-                      ),
-                      Text('${post.likesCount}'),
-                    ],
+                  PostHeader(timeDetail: true),
+                  SizedBox(height: 20),
+                  PostContent(preview: false),
+                  SizedBox(height: 5.0),
+                  InteractionRow(),
+                  SizedBox(height: 10.0),
+                  //Column(children: commentWidgets),
+                  FutureBuilder(
+                    future: getCommentsInCache(),
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.none:
+                          return Container(
+                            height: 70.0,
+                            color: Colors.grey,
+                          );
+                          break;
+                        case ConnectionState.waiting:
+                          return Container(
+                            height: 70.0,
+                            color: Colors.amber,
+                          );
+                          break;
+                        case ConnectionState.active:
+                          return Container(
+                            height: 70.0,
+                            color: Colors.green,
+                          );
+                          break;
+                        case ConnectionState.done:
+                          List<Comment> data = snapshot.data;
+
+                          if (data.isEmpty) {
+                            return Center(
+                              child: Text('No comments yet...'),
+                            );
+                          } else {
+                            List<Widget> commentWidgets2 = [];
+                            for (var commentData in snapshot.data) {
+                              commentWidgets2.add(
+                                CommentTile(
+                                  comment: commentData,
+                                ),
+                              );
+                            }
+
+                            return Column(children: commentWidgets2);
+                          }
+                          break;
+                        default:
+                          return Container(
+                            height: 70.0,
+                            color: Colors.red,
+                          );
+                      }
+                    },
                   ),
-                  Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.thumb_down),
-                        iconSize: 20.0,
-                        onPressed: () {
-                          setState(post.dislikePost);
-                        },
-                        color: post.disliked ? Colors.red : Colors.grey,
-                      ),
-                      Text('${post.dislikesCount}'),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.comment),
-                        iconSize: 20.0,
-                        onPressed: () {},
-                        color: post.commented ? Colors.blue : Colors.grey,
-                      ),
-                      Text('${post.comments.length}'),
-                    ],
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.share),
-                    iconSize: 20.0,
-                    onPressed: () {},
-                    color: Colors.grey,
+                  SizedBox(
+                    height: 80.0,
                   ),
                 ],
+              ),
+              Positioned(
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    color: Theme.of(context).canvasColor,
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextField(
+                            controller: _commentController,
+                            decoration: InputDecoration(
+                              hintText: 'Add a comment...',
+                            ),
+                            onChanged: (text) {
+                              setState(() {
+                                comment = text;
+                              });
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: () async {
+                            dynamic result = await _hs.addComment(
+                                _auth.getUID(), widget.post.id, comment);
+
+                            setState(() {
+                              if (result.runtimeType == String) {
+                                Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(result),
+                                  ),
+                                );
+                              } else {
+                                Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Comment posted.'),
+                                  ),
+                                );
+                                _commentsCache.invalidate();
+                                _commentController.clear();
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
         ),
-      ]),
+      ),
     );
   }
 }
